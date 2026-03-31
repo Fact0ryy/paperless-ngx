@@ -785,11 +785,13 @@ class TestConsumer(
         version = versions.first()
         assert version is not None
         assert version.original_filename is not None
+        root_doc.refresh_from_db()
         self.assertEqual(version.version_index, 1)
         self.assertEqual(version.version_label, "v2")
         self.assertIsNone(version.archive_serial_number)
         self.assertEqual(version.original_filename, version_file.name)
         self.assertTrue(bool(version.content))
+        self.assertEqual(root_doc.latest_content, version.content)
 
     @override_settings(AUDIT_LOG_ENABLED=True)
     @mock.patch("documents.consumer.load_classifier")

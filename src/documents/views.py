@@ -220,6 +220,7 @@ from documents.versioning import get_latest_version_for_root
 from documents.versioning import get_request_version_param
 from documents.versioning import get_root_document
 from documents.versioning import resolve_requested_version_for_root
+from documents.versioning import sync_root_latest_content
 from paperless import version
 from paperless.celery import app as celery_app
 from paperless.config import AIConfig
@@ -1022,6 +1023,7 @@ class DocumentViewSet(
                 str(updated_content) if updated_content is not None else ""
             )
             content_doc.save(update_fields=["content", "modified"])
+            sync_root_latest_content(root_doc)
 
         refreshed_doc = self.get_queryset().get(pk=root_doc.pk)
         response_data = self.get_serializer(refreshed_doc).data
@@ -1825,6 +1827,7 @@ class DocumentViewSet(
         index.remove_document_from_index(version_doc)
         version_doc_id = version_doc.id
         version_doc.delete()
+        sync_root_latest_content(root_doc)
         index.add_or_update_document(root_doc)
         if settings.AUDIT_LOG_ENABLED:
             actor = (

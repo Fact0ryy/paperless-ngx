@@ -55,6 +55,23 @@ def get_latest_version_for_root(
     return latest or root_doc
 
 
+def sync_root_latest_content(
+    root_doc: Document,
+    *,
+    include_deleted: bool = False,
+) -> None:
+    manager = _document_manager(include_deleted=include_deleted)
+    latest_version_content = (
+        manager.filter(root_document_id=root_doc.pk)
+        .order_by("-id")
+        .values_list("content", flat=True)
+        .first()
+    )
+    Document.objects.filter(pk=root_doc.pk).update(
+        latest_content=latest_version_content,
+    )
+
+
 def resolve_requested_version_for_root(
     root_doc: Document,
     request: Any,

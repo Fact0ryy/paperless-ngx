@@ -50,6 +50,7 @@ from documents.utils import compute_checksum
 from documents.utils import copy_basic_file_stats
 from documents.utils import copy_file_with_basic_stats
 from documents.utils import run_subprocess
+from documents.versioning import sync_root_latest_content
 from paperless.parsers import ParserContext
 from paperless.parsers import ParserProtocol
 from paperless.parsers.registry import get_parser_registry
@@ -537,6 +538,8 @@ class ConsumerPlugin(
                                     original_document.save()
                             else:
                                 original_document.save()
+
+                            sync_root_latest_content(root_doc)
 
                             # Create a log entry for the version addition, if enabled
                             if settings.AUDIT_LOG_ENABLED:
