@@ -1356,6 +1356,8 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             root_document=root,
             content="latest-version-content",
         )
+        root.latest_content = version.content
+        root.save(update_fields=["latest_content"])
 
         response = self.client.get(
             "/api/documents/?content__icontains=latest-version-content",

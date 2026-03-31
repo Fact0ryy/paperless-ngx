@@ -172,6 +172,8 @@ class TestDocument(TestCase):
             root_document=root,
             content="latest version content",
         )
+        root.latest_content = version.content
+        root.save(update_fields=["latest_content"])
 
         self.assertEqual(root.suggestion_content, version.content)
 

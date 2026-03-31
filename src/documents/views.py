@@ -35,10 +35,8 @@ from django.db.models import F
 from django.db.models import IntegerField
 from django.db.models import Max
 from django.db.models import Model
-from django.db.models import OuterRef
 from django.db.models import Prefetch
 from django.db.models import Q
-from django.db.models import Subquery
 from django.db.models import Sum
 from django.db.models import When
 from django.db.models.functions import Coalesce
@@ -895,16 +893,11 @@ class DocumentViewSet(
         }
 
     def get_queryset(self):
-        latest_version_content = Subquery(
-            Document.objects.filter(root_document=OuterRef("pk"))
-            .order_by("-id")
-            .values("content")[:1],
-        )
         return (
             Document.objects.filter(root_document__isnull=True)
             .distinct()
             .order_by("-created")
-            .annotate(effective_content=Coalesce(latest_version_content, F("content")))
+            .annotate(effective_content=Coalesce(F("latest_content"), F("content")))
             .annotate(num_notes=Count("notes"))
             .select_related("correspondent", "storage_path", "document_type", "owner")
             .prefetch_related(

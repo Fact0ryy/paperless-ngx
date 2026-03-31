@@ -777,6 +777,8 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
             root_document=root,
             content="v1-content",
         )
+        root.latest_content = "v1-content"
+        root.save(update_fields=["latest_content"])
 
         resp = self.client.get(f"/api/documents/{root.id}/")
 
@@ -797,6 +799,8 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
             root_document=root,
             content="v1-content",
         )
+        root.latest_content = v1.content
+        root.save(update_fields=["latest_content"])
 
         resp = self.client.get(f"/api/documents/{root.id}/?version={v1.id}")
 

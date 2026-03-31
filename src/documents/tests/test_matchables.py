@@ -62,6 +62,8 @@ class TestMatching(_TestMatchingBase):
             root_document=root,
             content="latest version contains keyword",
         )
+        root.latest_content = "latest version contains keyword"
+        root.save(update_fields=["latest_content"])
         tag = Tag.objects.create(
             name="tag",
             match="keyword",
@@ -86,6 +88,8 @@ class TestMatching(_TestMatchingBase):
             root_document=root,
             content="latest version without token",
         )
+        root.latest_content = "latest version without token"
+        root.save(update_fields=["latest_content"])
         tag = Tag.objects.create(
             name="tag",
             match="keyword",

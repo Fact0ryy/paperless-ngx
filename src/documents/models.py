@@ -385,27 +385,7 @@ class Document(SoftDeleteModel, ModelWithOwner):  # type: ignore[django-manager-
         if self.root_document_id is not None or self.pk is None:
             return self.content
 
-        prefetched_cache = getattr(self, "_prefetched_objects_cache", None)
-        prefetched_versions = (
-            prefetched_cache.get("versions")
-            if isinstance(prefetched_cache, dict)
-            else None
-        )
-        if prefetched_versions:
-            latest_prefetched = max(prefetched_versions, key=lambda doc: doc.id)
-            return latest_prefetched.content
-
-        latest_version_content = (
-            Document.objects.filter(root_document=self)
-            .order_by("-id")
-            .values_list("content", flat=True)
-            .first()
-        )
-        return (
-            latest_version_content
-            if latest_version_content is not None
-            else self.content
-        )
+        return self.latest_content if self.latest_content is not None else self.content
 
     @property
     def suggestion_content(self):
