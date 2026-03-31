@@ -19,44 +19,46 @@ from documents.tests.utils import DirectoriesMixin
 
 
 class TestBulkEditAPI(DirectoriesMixin, APITestCase):
+    @classmethod
+    def setUpTestData(cls) -> None:
+        super().setUpTestData()
+
+        cls.user = User.objects.create_superuser(username="temp_admin")
+        cls.c1 = Correspondent.objects.create(name="c1")
+        cls.c2 = Correspondent.objects.create(name="c2")
+        cls.dt1 = DocumentType.objects.create(name="dt1")
+        cls.dt2 = DocumentType.objects.create(name="dt2")
+        cls.t1 = Tag.objects.create(name="t1")
+        cls.t2 = Tag.objects.create(name="t2")
+        cls.doc1 = Document.objects.create(checksum="A", title="A")
+        cls.doc2 = Document.objects.create(
+            checksum="B",
+            title="B",
+            correspondent=cls.c1,
+            document_type=cls.dt1,
+            page_count=5,
+        )
+        cls.doc3 = Document.objects.create(
+            checksum="C",
+            title="C",
+            correspondent=cls.c2,
+            document_type=cls.dt2,
+        )
+        cls.doc4 = Document.objects.create(checksum="D", title="D")
+        cls.doc5 = Document.objects.create(checksum="E", title="E")
+        cls.doc2.tags.add(cls.t1)
+        cls.doc3.tags.add(cls.t2)
+        cls.doc4.tags.add(cls.t1, cls.t2)
+        cls.sp1 = StoragePath.objects.create(name="sp1", path="Something/{checksum}")
+        cls.cf1 = CustomField.objects.create(name="cf1", data_type="string")
+        cls.cf2 = CustomField.objects.create(name="cf2", data_type="string")
+
     def setUp(self) -> None:
         super().setUp()
-
-        user = User.objects.create_superuser(username="temp_admin")
-        self.user = user
-        self.client.force_authenticate(user=user)
-
+        self.client.force_authenticate(user=self.user)
         patcher = mock.patch("documents.bulk_edit.bulk_update_documents.delay")
         self.async_task = patcher.start()
         self.addCleanup(patcher.stop)
-        self.c1 = Correspondent.objects.create(name="c1")
-        self.c2 = Correspondent.objects.create(name="c2")
-        self.dt1 = DocumentType.objects.create(name="dt1")
-        self.dt2 = DocumentType.objects.create(name="dt2")
-        self.t1 = Tag.objects.create(name="t1")
-        self.t2 = Tag.objects.create(name="t2")
-        self.doc1 = Document.objects.create(checksum="A", title="A")
-        self.doc2 = Document.objects.create(
-            checksum="B",
-            title="B",
-            correspondent=self.c1,
-            document_type=self.dt1,
-            page_count=5,
-        )
-        self.doc3 = Document.objects.create(
-            checksum="C",
-            title="C",
-            correspondent=self.c2,
-            document_type=self.dt2,
-        )
-        self.doc4 = Document.objects.create(checksum="D", title="D")
-        self.doc5 = Document.objects.create(checksum="E", title="E")
-        self.doc2.tags.add(self.t1)
-        self.doc3.tags.add(self.t2)
-        self.doc4.tags.add(self.t1, self.t2)
-        self.sp1 = StoragePath.objects.create(name="sp1", path="Something/{checksum}")
-        self.cf1 = CustomField.objects.create(name="cf1", data_type="string")
-        self.cf2 = CustomField.objects.create(name="cf2", data_type="string")
 
     def setup_mock(self, m, method_name, return_value="OK") -> None:
         m.return_value = return_value

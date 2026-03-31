@@ -657,10 +657,13 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
 class TestApiUser(DirectoriesMixin, APITestCase):
     ENDPOINT = "/api/users/"
 
+    @classmethod
+    def setUpTestData(cls) -> None:
+        super().setUpTestData()
+        cls.user = User.objects.create_superuser(username="temp_admin")
+
     def setUp(self) -> None:
         super().setUp()
-
-        self.user = User.objects.create_superuser(username="temp_admin")
         self.client.force_authenticate(user=self.user)
 
     def test_get_users(self) -> None:
@@ -996,10 +999,13 @@ class TestApiUser(DirectoriesMixin, APITestCase):
 class TestApiGroup(DirectoriesMixin, APITestCase):
     ENDPOINT = "/api/groups/"
 
+    @classmethod
+    def setUpTestData(cls) -> None:
+        super().setUpTestData()
+        cls.user = User.objects.create_superuser(username="temp_admin")
+
     def setUp(self) -> None:
         super().setUp()
-
-        self.user = User.objects.create_superuser(username="temp_admin")
         self.client.force_authenticate(user=self.user)
 
     def test_get_groups(self) -> None:
@@ -1097,20 +1103,23 @@ class TestApiGroup(DirectoriesMixin, APITestCase):
 
 
 class TestBulkEditObjectPermissions(APITestCase):
+    @classmethod
+    def setUpTestData(cls) -> None:
+        super().setUpTestData()
+
+        cls.temp_admin = User.objects.create_superuser(username="temp_admin")
+        cls.t1 = Tag.objects.create(name="t1")
+        cls.t2 = Tag.objects.create(name="t2")
+        cls.c1 = Correspondent.objects.create(name="c1")
+        cls.dt1 = DocumentType.objects.create(name="dt1")
+        cls.sp1 = StoragePath.objects.create(name="sp1")
+        cls.user1 = User.objects.create(username="user1")
+        cls.user2 = User.objects.create(username="user2")
+        cls.user3 = User.objects.create(username="user3")
+
     def setUp(self) -> None:
         super().setUp()
-
-        self.temp_admin = User.objects.create_superuser(username="temp_admin")
         self.client.force_authenticate(user=self.temp_admin)
-
-        self.t1 = Tag.objects.create(name="t1")
-        self.t2 = Tag.objects.create(name="t2")
-        self.c1 = Correspondent.objects.create(name="c1")
-        self.dt1 = DocumentType.objects.create(name="dt1")
-        self.sp1 = StoragePath.objects.create(name="sp1")
-        self.user1 = User.objects.create(username="user1")
-        self.user2 = User.objects.create(username="user2")
-        self.user3 = User.objects.create(username="user3")
 
     def test_bulk_object_set_permissions(self) -> None:
         """
@@ -1406,10 +1415,13 @@ class TestBulkEditObjectPermissions(APITestCase):
 
 
 class TestFullPermissionsFlag(APITestCase):
+    @classmethod
+    def setUpTestData(cls) -> None:
+        super().setUpTestData()
+        cls.admin = User.objects.create_superuser(username="admin")
+
     def setUp(self) -> None:
         super().setUp()
-
-        self.admin = User.objects.create_superuser(username="admin")
 
     def test_full_perms_flag(self) -> None:
         """

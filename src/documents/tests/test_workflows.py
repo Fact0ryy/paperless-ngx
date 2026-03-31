@@ -76,24 +76,27 @@ class TestWorkflows(
     SampleDirMixin,
     APITestCase,
 ):
-    def setUp(self) -> None:
-        self.c = Correspondent.objects.create(name="Correspondent Name")
-        self.c2 = Correspondent.objects.create(name="Correspondent Name 2")
-        self.dt = DocumentType.objects.create(name="DocType Name")
-        self.t1 = Tag.objects.create(name="t1")
-        self.t2 = Tag.objects.create(name="t2")
-        self.t3 = Tag.objects.create(name="t3")
-        self.sp = StoragePath.objects.create(path="/test/")
-        self.cf1 = CustomField.objects.create(name="Custom Field 1", data_type="string")
-        self.cf2 = CustomField.objects.create(
+    @classmethod
+    def setUpTestData(cls) -> None:
+        super().setUpTestData()
+
+        cls.c = Correspondent.objects.create(name="Correspondent Name")
+        cls.c2 = Correspondent.objects.create(name="Correspondent Name 2")
+        cls.dt = DocumentType.objects.create(name="DocType Name")
+        cls.t1 = Tag.objects.create(name="t1")
+        cls.t2 = Tag.objects.create(name="t2")
+        cls.t3 = Tag.objects.create(name="t3")
+        cls.sp = StoragePath.objects.create(path="/test/")
+        cls.cf1 = CustomField.objects.create(name="Custom Field 1", data_type="string")
+        cls.cf2 = CustomField.objects.create(
             name="Custom Field 2",
             data_type="integer",
         )
 
-        self.user2 = User.objects.create(username="user2")
-        self.user3 = User.objects.create(username="user3")
-        self.group1 = Group.objects.create(name="group1")
-        self.group2 = Group.objects.create(name="group2")
+        cls.user2 = User.objects.create(username="user2")
+        cls.user3 = User.objects.create(username="user3")
+        cls.group1 = Group.objects.create(name="group1")
+        cls.group2 = Group.objects.create(name="group2")
 
         account1 = MailAccount.objects.create(
             name="Email1",
@@ -104,7 +107,7 @@ class TestWorkflows(
             imap_security=MailAccount.ImapSecurity.SSL,
             character_set="UTF-8",
         )
-        self.rule1 = MailRule.objects.create(
+        cls.rule1 = MailRule.objects.create(
             name="Rule1",
             account=account1,
             folder="INBOX",
@@ -122,7 +125,8 @@ class TestWorkflows(
             assign_owner_from_rule=False,
         )
 
-        return super().setUp()
+    def setUp(self) -> None:
+        super().setUp()
 
     def test_workflow_match(self) -> None:
         """

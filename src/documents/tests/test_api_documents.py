@@ -51,10 +51,13 @@ from documents.tests.utils import DocumentConsumeDelayMixin
 
 
 class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
+    @classmethod
+    def setUpTestData(cls) -> None:
+        super().setUpTestData()
+        cls.user = User.objects.create_superuser(username="temp_admin")
+
     def setUp(self) -> None:
         super().setUp()
-
-        self.user = User.objects.create_superuser(username="temp_admin")
         self.client.force_authenticate(user=self.user)
         cache.clear()
 
