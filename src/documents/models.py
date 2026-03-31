@@ -196,6 +196,16 @@ class Document(SoftDeleteModel, ModelWithOwner):  # type: ignore[django-manager-
         ),
     )
 
+    latest_content = models.TextField(
+        _("latest content"),
+        blank=True,
+        null=True,
+        help_text=_(
+            "Materialized effective content for root documents. "
+            "Uses the latest version content when available.",
+        ),
+    )
+
     content_length = models.GeneratedField(
         expression=Length("content"),
         output_field=PositiveIntegerField(default=0),
